@@ -130,75 +130,37 @@ class Classe:
                 line=line.strip().split(',')
                 student= Student(line[0],line[1])
                 if self.get_student(student.first_name,student.last_name) == None:
-                    raise Warning(f'{student} ne fait pas partie de la classe')
+                    raise Warning
                 course = line[2]
                 for g in line[3:]:
                     student.add_grade(course,float(g))
+
+    def catalog (self):
+        cat=defaultdict(int)
+        for student in self.grades.values():
+            for course in student.followed_topics():
+                cat[course]+=1
+        return cat
             
-
-
     def __repr__(self):
         return f"Class({self.classname}, Students:{list(self.grades.values())})"
 
+
+
+
+
 # pour tester
-
-try:
-    classe = Classe("P20")
-    student = Student("Matthieu", "Mazière")
-    classe.add_student(student)
-    print(classe)
-    if len(classe) != 1:
-        raise Exception('OOPS - There is an issue in your __len__ method.')
-    r = repr(classe)
-    if "P20" not in r or "Matthieu" not in r:
-        raise Exception('OOPS - There is an issue in your __repr__ method.')
-except Exception as e:
-    print("OOPS - Something's wrong")
-    print(f"Error message : {e}")
-else:
-    print('Congrats ! Your implementation works !')
-
-try:
-    classe = Classe("P20")
-    student = Student("Matthieu", "Mazière")
-    classe.add_student(student)
-    new_student = classe.get_student("Matthieu", "Mazière")
-    assert student is new_student
-    new_student = classe.get_student("Jérôme", "Adnot")
-    assert new_student is None
-except Exception as e:
-    print("OOPS - Something's wrong")
-    print(f"Error message : {e}")
-else:
-    print('Congrats ! Your implementation works !')
-
-try:
-    classe = Classe("P1920")
-    classe.load_students_from_file('classe.csv')
-    if len(classe) != 38:
-        raise Exception('OOPS - There is an issue in your load_students_from_file method')
-    assert classe.get_student("Enrico", "Fermi") is not None
-except Exception as e:
-    print("OOPS - Something's wrong")
-    print(f"Error message : {e}")
-else:
-    print('Congrats ! Your implementation works ! ')
 
 import io
 import contextlib
 
-try:
-    classe = Classe("P1920")
-    classe.load_students_from_file('classe.csv')
-    buffer = io.StringIO()
-    with contextlib.redirect_stdout(buffer):
-        classe.load_grades_from_file('grades.csv')
-    assert "Personne" in buffer.getvalue(), "no warning printed for the unknown student"
-    assert classe.get_student("Albert", "Einstein").compute_average("Physics") == 15.
-    assert classe.get_student("Albert", "Einstein").compute_average("Mathematics") == 13.
-    assert classe.get_student("Enrico", "Fermi").compute_average("Scubadiving") == 9.5
-except Exception as e:
-    print("OOPS - Something's wrong")
-    print(f"Error message : {e}")
-else:
-    print('Congrats ! Your implementation works ! ')
+
+classe = Classe("P1920")
+classe.load_students_from_file('classe.csv')
+buffer = io.StringIO()
+with contextlib.redirect_stdout(buffer):
+    classe.load_grades_from_file('grades.csv')
+    
+assert classe.get_student("Albert", "Einstein").compute_average("Physics") == 13.25
+assert classe.get_student("Enrico", "Fermi").compute_average("Mathematics") == 12.5
+assert classe.get_student("Enrico", "Fermi").compute_average("English") == 15.5

@@ -118,17 +118,28 @@ class Classe:
         return self.grades.get((first_name, last_name))
 
     def load_students_from_file(self, filename: str):
-        for line in open(filename, 'r', encoding='utf-8'):
-            line.strip().split(',')
-            student= Student(line[0],line[1])
-            course= line[2]
-            for g in line[3:]:
-                student.add_grade(course,g)
-            self.add_student(student)
+        with open(filename, 'r', encoding='utf-8') as data:
+            for line in data:
+                line=line.strip().split(',')
+                student=Student(line[0], line[1])
+                self.add_student(student)
+
+    def load_grades_from_file(self, filename: str): 
+         with open(filename, 'r', encoding='utf-8') as data:
+            for line in data:
+                line=line.strip().split(',')
+                student= Student(line[0],line[1])
+                if self.get_student(student.first_name,student.last_name) == None:
+                    raise Warning(f'{student} ne fait pas partie de la classe')
+                course = line[2]
+                for g in line[3:]:
+                    student.add_grade(course,float(g))
+            
 
 
     def __repr__(self):
         return f"Class({self.classname}, Students:{list(self.grades.values())})"
+
 # pour tester
 
 try:
@@ -163,10 +174,29 @@ else:
 
 try:
     classe = Classe("P1920")
-    classe.load_students_from_file('grades.csv')
+    classe.load_students_from_file('classe.csv')
     if len(classe) != 38:
         raise Exception('OOPS - There is an issue in your load_students_from_file method')
     assert classe.get_student("Enrico", "Fermi") is not None
+except Exception as e:
+    print("OOPS - Something's wrong")
+    print(f"Error message : {e}")
+else:
+    print('Congrats ! Your implementation works ! ')
+
+import io
+import contextlib
+
+try:
+    classe = Classe("P1920")
+    classe.load_students_from_file('classe.csv')
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        classe.load_grades_from_file('grades.csv')
+    assert "Personne" in buffer.getvalue(), "no warning printed for the unknown student"
+    assert classe.get_student("Albert", "Einstein").compute_average("Physics") == 15.
+    assert classe.get_student("Albert", "Einstein").compute_average("Mathematics") == 13.
+    assert classe.get_student("Enrico", "Fermi").compute_average("Scubadiving") == 9.5
 except Exception as e:
     print("OOPS - Something's wrong")
     print(f"Error message : {e}")

@@ -105,13 +105,54 @@ class Student:
 
 class Classe:
     def __init__(self, classname: str):
-        pass
+        self.classname=classname
+        self.grades=defaultdict(list)
 
     def add_student(self, student: Student):
-        pass
+        self.grades[(student.first_name, student.last_name)]=student
 
     def __len__(self):
-        return 0
+        return len(self.grades.keys())
+
+    def get_student(self, first_name: str, last_name: str):
+        return self.grades.get((first_name, last_name))
+
+    def load_students_from_file(filename: str):
+        open(filename, 'r', encoding='utf-8')
+        line.strip().split(',')
+        
+
 
     def __repr__(self):
-        return ""
+        return f"Class({self.classname}, Students:{list(self.grades.values())})"
+# pour tester
+
+try:
+    classe = Classe("P20")
+    student = Student("Matthieu", "Mazière")
+    classe.add_student(student)
+    print(classe)
+    if len(classe) != 1:
+        raise Exception('OOPS - There is an issue in your __len__ method.')
+    r = repr(classe)
+    if "P20" not in r or "Matthieu" not in r:
+        raise Exception('OOPS - There is an issue in your __repr__ method.')
+except Exception as e:
+    print("OOPS - Something's wrong")
+    print(f"Error message : {e}")
+else:
+    print('Congrats ! Your implementation works !')
+
+try:
+    classe = Classe("P20")
+    student = Student("Matthieu", "Mazière")
+    classe.add_student(student)
+    new_student = classe.get_student("Matthieu", "Mazière")
+    assert student is new_student
+    new_student = classe.get_student("Jérôme", "Adnot")
+    assert new_student is None
+except Exception as e:
+    print("OOPS - Something's wrong")
+    print(f"Error message : {e}")
+else:
+    print('Congrats ! Your implementation works !')

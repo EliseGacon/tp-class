@@ -33,10 +33,9 @@ print(p)
 # 3) Il s'affiche  <__main__.Point object at 0x00000127A72ECA50> --> renvoie le type de l'objet
 
 class Bad:
-    items = []
-
-    def add(self, x):
+    def __init__(self):
         self.items = []
+    def add(self, x):
         self.items.append(x)
 
 a, b = Bad(), Bad()
@@ -71,20 +70,48 @@ class Student:
     def __init__(self, first_name: str, last_name: str):
         self.first_name=first_name
         self.last_name=last_name
-        self.Grade={}
+        self.grades=defaultdict(list)
+
+    def add_grade(self, course: str, grade: float):
+        if 0 <= grade <= 20:
+            self.grades[course].append(grade)
+        else:
+            raise ValueError
+        
+    def followed_topics(self):
+        return list(self.grades.keys())
+    
+    def compute_average(self, course: str):
+        if course in self.grades:
+            return sum(self.grades[course])/len(self.grades[course])
+        else:
+            raise ValueError
+    def report(self):
+        lignes=[f"Report for student {self.first_name} {self.last_name}"
+                ,f"+===============+===============+",
+                f"|     Topic     |    Average    |", 
+                f"+===============+===============+" ]
+        sep = f"+---------------+---------------+"
+        for topic in self.grades.keys():
+            average= self.compute_average(topic)
+            lignes.append(f"|{topic:^15}|{average:^15.2f}|")
+            lignes.append(sep)
+        return "\n".join(lignes)
+    
+    def __repr__(self):
+        return f"Student({self.first_name} {self.last_name}, Grade = {self.grades})"
+    
+
+
+class Classe:
+    def __init__(self, classname: str):
+        pass
+
+    def add_student(self, student: Student):
+        pass
+
+    def __len__(self):
+        return 0
 
     def __repr__(self):
-        return f"Student({self.first_name} {self.last_name}, Grade = {self.Grade})"
-
-try:
-    student = Student("Achille", "Talon")
-    r = repr(student)
-    assert isinstance(r, str), "__repr__ must return a str"
-    assert "Achille" in r and "Talon" in r, f"first and last name should appear in {r!r}"
-except Exception as e:
-    print('OOPS - There is an issue in your code.')
-    print(f"Error message : {e}")
-else:
-    print('Congrats ! Your implementation works !')
-
-
+        return ""

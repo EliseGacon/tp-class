@@ -134,6 +134,10 @@ class Classe:
                 course = line[2]
                 for g in line[3:]:
                     student.add_grade(course,float(g))
+                    self.grades[(line[0],line[1])]=student
+                print(self.get_student(student.first_name,student.last_name)) #pb: on recrée un dictionnaire à 
+                # chaque fois pour l'élève : si l'élève est présent dans plusieurs cours, on a au final un dictionnaire avec 
+                # seulement la dernière matière appelée
 
     def catalog (self):
         cat=defaultdict(int)
@@ -157,6 +161,8 @@ import contextlib
 
 classe = Classe("P1920")
 classe.load_students_from_file('classe.csv')
+classe.load_grades_from_file('grades.csv')
+print(classe.get_student("Enrico", "Fermi"))
 buffer = io.StringIO()
 with contextlib.redirect_stdout(buffer):
     classe.load_grades_from_file('grades.csv')

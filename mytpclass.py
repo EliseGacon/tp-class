@@ -117,10 +117,14 @@ class Classe:
     def get_student(self, first_name: str, last_name: str):
         return self.grades.get((first_name, last_name))
 
-    def load_students_from_file(filename: str):
-        open(filename, 'r', encoding='utf-8')
-        line.strip().split(',')
-        
+    def load_students_from_file(self, filename: str):
+        for line in open(filename, 'r', encoding='utf-8'):
+            line.strip().split(',')
+            student= Student(line[0],line[1])
+            course= line[2]
+            for g in line[3:]:
+                student.add_grade(course,g)
+            self.add_student(student)
 
 
     def __repr__(self):
@@ -156,3 +160,15 @@ except Exception as e:
     print(f"Error message : {e}")
 else:
     print('Congrats ! Your implementation works !')
+
+try:
+    classe = Classe("P1920")
+    classe.load_students_from_file('grades.csv')
+    if len(classe) != 38:
+        raise Exception('OOPS - There is an issue in your load_students_from_file method')
+    assert classe.get_student("Enrico", "Fermi") is not None
+except Exception as e:
+    print("OOPS - Something's wrong")
+    print(f"Error message : {e}")
+else:
+    print('Congrats ! Your implementation works ! ')

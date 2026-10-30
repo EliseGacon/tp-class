@@ -128,16 +128,15 @@ class Classe:
          with open(filename, 'r', encoding='utf-8') as data:
             for line in data:
                 line=line.strip().split(',')
-                student= Student(line[0],line[1])
+                student= self.get_student(line[0],line[1])
                 if self.get_student(student.first_name,student.last_name) == None:
+                    student= Student(line[0],line[1])
+                    self.add_student(student)
                     raise Warning
                 course = line[2]
                 for g in line[3:]:
                     student.add_grade(course,float(g))
                     self.grades[(line[0],line[1])]=student
-                print(self.get_student(student.first_name,student.last_name)) #pb: on recrée un dictionnaire à 
-                # chaque fois pour l'élève : si l'élève est présent dans plusieurs cours, on a au final un dictionnaire avec 
-                # seulement la dernière matière appelée
 
     def catalog (self):
         cat=defaultdict(int)
@@ -145,28 +144,20 @@ class Classe:
             for course in student.followed_topics():
                 cat[course]+=1
         return cat
+
+    def compute_averages(self):
+        dic= defaultdict(int)
+        for student in self.grades.values():
+            for course in student.followed_topics():
+                avg = student.compute_average(course)
+                dic[course]+=avg
+        cat = self.catalog()
+        for course, nb in cat.items():
+            dic[course]=dic[course]/nb
+        return dic
             
     def __repr__(self):
         return f"Class({self.classname}, Students:{list(self.grades.values())})"
 
 
 
-
-
-# pour tester
-
-import io
-import contextlib
-
-
-classe = Classe("P1920")
-classe.load_students_from_file('classe.csv')
-classe.load_grades_from_file('grades.csv')
-print(classe.get_student("Enrico", "Fermi"))
-buffer = io.StringIO()
-with contextlib.redirect_stdout(buffer):
-    classe.load_grades_from_file('grades.csv')
-    
-assert classe.get_student("Albert", "Einstein").compute_average("Physics") == 13.25
-assert classe.get_student("Enrico", "Fermi").compute_average("Mathematics") == 12.5
-assert classe.get_student("Enrico", "Fermi").compute_average("English") == 15.5

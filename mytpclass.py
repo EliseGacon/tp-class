@@ -155,9 +155,26 @@ class Classe:
         for course, nb in cat.items():
             dic[course]=dic[course]/nb
         return dic
-            
+
+    def detailed_report(self, student: Student | None):
+        if student is None: 
+            return "Student not found in the class."
+        lignes=[f"Detailed Report for student {student.first_name} {student.last_name}"
+                        ,f"+===============+===============+===============+",
+                        f"|     Topic     |    Average    |   Class Avg   |", 
+                        f"+===============+===============+===============+" ]
+        sep = f"+---------------+---------------+---------------+"
+        avgs= self.compute_averages()        
+        for topic in student.grades.keys():
+            average = student.compute_average(topic)
+            class_avg = avgs[topic]
+            lignes.append(f"|{topic:^15}|{average:^15.2f}|{class_avg:^15.2f}|")
+            lignes.append(sep)
+        return "\n".join(lignes)
+               
     def __repr__(self):
         return f"Class({self.classname}, Students:{list(self.grades.values())})"
+
 
 
 
